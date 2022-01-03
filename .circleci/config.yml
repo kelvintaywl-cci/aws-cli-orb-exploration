@@ -1,17 +1,25 @@
 version: 2.1
 
+orbs:
+  aws-cli
+
 jobs:
-  echo:
-    docker:
-      - image: cimg/base:stable
+  test_aws_cli:
+    executor: aws-cli/default
+    resource_class: small
     steps:
+      - aws-cli/setup:
+          aws-access-key-id: FOO
+          aws-secret-access-key: BAR
       - run:
-          name: Greet
-          command: echo "I love ${COLOR} builds."
-          environment:
-            COLOR: "green"
+          name: test AWS CLI
+          command: |
+            cat ~/.aws/config
+            cat ~/.aws/credentials
+            aws sts get-caller-identity | jq ".Arn"
+
 
 workflows:
   main:
     jobs:
-      - echo
+      - test_aws_cli
