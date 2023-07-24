@@ -1,25 +1,28 @@
 version: 2.1
 
-orbs:
-  aws-cli: circleci/aws-cli@2.0.6
-
 jobs:
-  test_aws_cli:
-    executor: aws-cli/default
-    resource_class: small
+  deploy:
+    docker:
+      # alpine
+      - image: node:dubnium-alpine
+    resource_class: medium
+    working_directory: ~/repo
     steps:
-      - aws-cli/setup:
-          aws-access-key-id: FOO
-          aws-secret-access-key: BAR
       - run:
-          name: test AWS CLI
+          name: Install certificates
+          command: apk --update add openssl ca-certificates
+      - run:
+          name: Install Python and Pip
           command: |
-            cat ~/.aws/config
-            cat ~/.aws/credentials
-            aws sts get-caller-identity | jq ".Arn"
+            apk --update add python py-pip
 
+            which python && python --version
+            which pip && pip --version
+      - run:
+          name: Install AWS via Pip
+          command: pip install awscli
 
 workflows:
   main:
     jobs:
-      - test_aws_cli
+      - deploy
