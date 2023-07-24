@@ -12,15 +12,18 @@ jobs:
           name: Install certificates
           command: apk --update add openssl ca-certificates
       - run:
-          name: Install Python and Pip
+          name: Install Python3 and Pip
           command: |
-            apk --update add python py-pip
+            apk --update add python3 py3-pip
 
             which python && python --version
             which pip && pip --version
       - run:
           name: Install AWS via Pip
-          command: pip install awscli
+          command: |
+            pip install awscli
+
+            which aws && aws --version
 
 workflows:
   main:
